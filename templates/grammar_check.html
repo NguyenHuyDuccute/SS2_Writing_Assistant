@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Grammar Check Result</title>
+      <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}" />
+  </head>
+  <body>
+  <h1>Grammar Check</h1>
+  <div class="container">
+   <div class="container-text-field">
+    <form id="grammar-form" method="post">
+        <textarea type="text" name="text" placeholder="Enter document" required ></textarea>
+      <input type="submit" value="Check Grammar">
+    </form>
+   </div>
+  <div class="container-result-field">
+    <h1>Grammar Check Result</h1>
+    <p>Corrected Text:</p>
+  <div class="corrected_text"></div>
+  </div>
+  </div>
+  <script src="../static/app.js"></script>
+  </body>
+</html>
+
