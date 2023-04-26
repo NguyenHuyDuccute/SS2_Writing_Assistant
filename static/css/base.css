@@ -1,0 +1,40 @@
+nav {
+  background-color: #10a37f;
+  height: 100px;
+  margin-bottom: 50px;
+}
+
+nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: center;
+}
+
+nav ul li {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+/*nav ul li.logo {*/
+/*  margin-right: auto;*/
+/*  height: 10px;*/
+/*}*/
+nav ul li a {
+  display: inline-block;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  text-decoration: none;
+  padding: 40px 20px;
+  transition: all 0.2s ease-in-out;
+}
+
+nav ul li a:hover {
+  background-color: #35ecb6;
+  border-radius: 10px;
+}
+nav a.active {
+  background-color: #fff;
+  color: #333;
+}

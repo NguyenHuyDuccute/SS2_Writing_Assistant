@@ -1,13 +1,14 @@
 {% extends 'base.html' %}
 {% block css %}
-      <link rel="stylesheet" href="{{ url_for('static',filename='css/grammarCheck.css') }}"/> {% endblock %}
+      <link rel="stylesheet" href="{{ url_for('static',filename='css/grammarCheck.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/textCompletion.css') }}"/>
+{% endblock %}
 {% block content %}
   <div class="container">
    <div class="container-text-field">
     <form id="grammar-form" method="post">
         <textarea class="text-area" name="text" placeholder="Start by writing, pasting (Ctrl + V) text, or uploading a document (doc, pdf)" required ></textarea>
-        <input type="submit" class="grammar-button" value="Check Grammar">
-        <div class="loader"></div>
+        <input type="submit" value="Text Completion">
     </form>
    </div>
   <div class="container-result-field">
@@ -15,6 +16,5 @@
   <div class="corrected_text"></div>
   </div>
   </div>
-  <script src="../static/js/app.js"></script>
+  <script src="../static/textCompletion.js"></script>
 {% endblock %}
-
