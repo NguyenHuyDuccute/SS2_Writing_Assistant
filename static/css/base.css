@@ -29,7 +29,16 @@ nav ul li a {
   padding: 40px 20px;
   transition: all 0.2s ease-in-out;
 }
+.inout{
+  float: right;
+  font-size: 24px;
+  margin-right: 5px;
 
+}
+.inout a{
+  text-decoration: none;
+  color: #aa00ff;
+}
 nav ul li a:hover {
   background-color: #35ecb6;
   border-radius: 10px;

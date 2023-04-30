@@ -16,10 +16,18 @@
            </div>
   <ul>
     <li><a href="/" class="nav-link" >Plagiarism check</a></li>
+
       <li><a href="/grammar-check" class="nav-link">Grammar Check</a></li>
     <li><a href="/text-completion" class="nav-link">Text completion</a></li>
     <li><a href="#" class="nav-link">Paraphrasing</a></li>
-  </ul>
+
+  </ul> <div class="inout">
+           {% if is_logged_in %}
+      <a href="/logout" class="nav-link">Logout</a>
+      {% else %}
+      <a href="/login" class="nav-link">Login</a>
+    {% endif %}
+           </div>
 </nav>
     </header>
     <main>
