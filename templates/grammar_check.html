@@ -1,20 +1,22 @@
 {% extends 'base.html' %}
 {% block css %}
-      <link rel="stylesheet" href="{{ url_for('static',filename='css/grammarCheck.css') }}"/> {% endblock %}
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/grammarCheck.css') }}"/> {% endblock %}
 {% block content %}
-  <div class="container">
-   <div class="container-text-field">
-    <form id="grammar-form" method="post">
-        <textarea class="text-area" name="text" placeholder="Start by writing, pasting (Ctrl + V) text, or uploading a document (doc, pdf)" required ></textarea>
-        <input type="submit" class="grammar-button" value="Check Grammar">
-        <div class="loader"></div>
-    </form>
-   </div>
-  <div class="container-result-field">
-    <p>Corrected Text:</p>
-  <div class="corrected_text"></div>
-  </div>
-  </div>
-  <script src="../static/js/app.js"></script>
+    <div class="container">
+        <div class="container-text-field">
+            <form id="grammar-form" method="post">
+                <textarea class="text-area" name="text"
+                          placeholder="Start by writing, pasting (Ctrl + V) text, or uploading a document (doc, pdf)"
+                          required></textarea>
+                <input type="submit" class="grammar-button" value="Check Grammar">
+                <div class="loader"></div>
+            </form>
+        </div>
+        <div class="container-result-field">
+            <p>Corrected Text:</p>
+            <div class="corrected_text"></div>
+        </div>
+    </div>
+    <script src="../static/js/app.js"></script>
 {% endblock %}
 

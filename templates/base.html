@@ -3,39 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <title>Writing Assistant</title>
-  <link rel="icon" href="../static/assets/Logo.ico" type="image/x-icon">
-  <link rel="shortcut icon" href="../static/assets/Logo%20(1).ico" type="image/x-icon">
+    <link rel="icon" href="../static/assets/Logo.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="../static/assets/Logo%20(1).ico" type="image/x-icon">
     <link rel="stylesheet" href="../static/css/base.css">
     <link rel="stylesheet" href="../static/css/main.css">
     {% block css %} {% endblock %}
 </head>
 <body>
-    <header>
-       <nav> <div style="height: 100px;float:left;margin-left: 20px;justify-items: center;">
-           <img src="../static/assets/Logo.png" alt="logo" height="90px" style="margin-top:5px">
-           </div>
-  <ul>
-    <li><a href="/" class="nav-link" >Plagiarism check</a></li>
+<header>
+    <nav>
+        <div style="height: 100px;float:left;margin-left: 20px;justify-items: center;">
+            <img src="../static/assets/Logo.png" alt="logo" height="90px" style="margin-top:5px">
+        </div>
+        <ul>
+            <li><a href="/" class="nav-link">Plagiarism check</a></li>
 
-      <li><a href="/grammar-check" class="nav-link">Grammar Check</a></li>
-    <li><a href="/text-completion" class="nav-link">Text completion</a></li>
-    <li><a href="#" class="nav-link">Paraphrasing</a></li>
-
-  </ul> <div class="inout">
-           {% if is_logged_in %}
-      <a href="/logout" class="nav-link">Logout</a>
-      {% else %}
-      <a href="/login" class="nav-link">Login</a>
-    {% endif %}
-           </div>
-</nav>
-    </header>
-    <main>
-      {% block content %} {% endblock %}
-    </main>
-    <footer>
-    </footer>
-     <script src="../static/js/app.js"></script>
-    <script src="../static/js/base.js"></script>
+            <li><a href="{{url_for('grammar_check') }}" class="nav-link">Grammar Check</a></li>
+            <li><a href="{{ url_for('text_completion')}}" class="nav-link">Text completion</a></li>
+            <li><a href="{{ url_for('paraphrasing') }}" class="nav-link">Paraphrasing</a></li>
+        </ul>
+        <div class="inout">
+            {% if is_logged_in %}
+                <img src="{{ session['picture'] }}" alt="{{ session['name'] }}" style="border-radius: 50%">
+                <p>Welcome, {{ name }}!</p>
+                <a href="/logout" class="nav-log">Log out</a>
+            {% else %}
+                <a href="/login" class="nav-log">Log in</a>
+            {% endif %}
+        </div>
+    </nav>
+</header>
+<main>
+    {% block content %} {% endblock %}
+</main>
+<footer>
+</footer>
+<script src="../static/js/app.js"></script>
+<script src="../static/js/base.js"></script>
 </body>
 </html>

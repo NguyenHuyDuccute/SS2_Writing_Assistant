@@ -8,7 +8,7 @@ grammarForm.addEventListener('submit', (event) => {
     grammarButton.style.display="none";
   const formData = new FormData(grammarForm);
   console.log(formData)
-  fetch('/text-completion-post', {
+  fetch('/paraphrasing-post', {
     method: 'POST',
     body: formData
   })

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block css %}
     <link rel="stylesheet" href="{{ url_for('static',filename='css/grammarCheck.css') }}"/>
-    <link rel="stylesheet" href="{{ url_for('static',filename='css/textCompletion.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/paraphrasing.css') }}"/>
 {% endblock %}
 {% block content %}
     <div class="container">
@@ -10,14 +10,15 @@
                 <textarea class="text-area" name="text"
                           placeholder="Start by writing, pasting (Ctrl + V) text, or uploading a document (doc, pdf)"
                           required></textarea>
-                <input type="submit" class="grammar-button" value="Text Completion">
+                <input type="submit" class="grammar-button" value="Paraphrasing">
                 <div class="loader"></div>
             </form>
         </div>
         <div class="container-result-field">
-            <p>Corrected Text:</p>
+            <p>Paraphased passage:</p>
             <div class="corrected_text"></div>
         </div>
     </div>
-    <script src="../static/js/textCompletion.js"></script>
+    <script src="../static/js/paraphrasing.js"></script>
 {% endblock %}
+

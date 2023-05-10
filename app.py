@@ -46,6 +46,9 @@ def login_required(func):
 @app.route("/grammar-check", methods=['GET', 'POST'])
 @login_required
 def grammar_check():
+    name = session.get('name', 'Unknown')
+    picture = session.get('picture', 'Unknown')
+    first_name = name.split()[0]
     if request.method == "POST":
         input_text = request.form['text']
         response = openai.Completion.create(
@@ -58,11 +61,50 @@ def grammar_check():
             presence_penalty=0.0
         )
         corrected_text = response.choices[0].text.strip()
-        return render_template('grammar_check.html', corrected_text=corrected_text, is_logged_in=True)
-    return render_template('grammar_check.html', is_logged_in=True)
+        return render_template('grammar_check.html', corrected_text=corrected_text, is_logged_in=True, name=first_name,
+                               picture=picture)
+    return render_template('grammar_check.html', is_logged_in=True, name=first_name, picture=picture)
 
 
-# Correct this to standard English
+@app.route("/paraphrasing", methods=['GET', 'POST'])
+@login_required
+def paraphrasing():
+    name = session.get('name', 'Unknown')
+    picture = session.get('picture', 'Unknown')
+    first_name = name.split()[0]
+    if request.method == "POST":
+        input_text = request.form['text']
+        response = openai.Completion.create(
+            model="text-davinci-003",
+            prompt=f"paraphase the following paragraph, using as few words from the original paragraph as possible:\n\n{input_text}.",
+            temperature=0,
+            max_tokens=60,
+            top_p=1.0,
+            frequency_penalty=0.0,
+            presence_penalty=0.0
+        )
+        corrected_text = response.choices[0].text.strip()
+        return render_template('paraphrasing.html', corrected_text=corrected_text, is_logged_in=True, name=first_name,
+                               picture=picture)
+    return render_template('paraphrasing.html', is_logged_in=True, name=first_name, picture=picture)
+
+
+@app.route("/paraphrasing-post", methods=['POST'])
+def paraphrasing_post():
+    if request.method == "POST":
+        input_text = request.form['text']
+        response = openai.Completion.create(
+            model="text-davinci-003",
+            prompt=f"paraphase and provide several paraphrased versions(serial numbering on each version) the following paragraph, using as few words from the original paragraph as possible:\n\n{input_text}.",
+            temperature=0.7,
+            max_tokens=256,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
+        )
+        corrected_text = response.choices[0].text.strip()
+        return corrected_text
+
 
 @app.route("/grammar-check-post", methods=['POST'])
 def test():
@@ -84,15 +126,39 @@ def test():
 @app.route('/')
 def index():
     if 'email' in session:
-        return render_template('base.html', is_logged_in=True)
+        name = session.get('name', 'Unknown')
+        picture = session.get('picture', 'Unknown')
+        first_name = name.split()[0]
+        return render_template('base.html', is_logged_in=True, name=first_name, picture=picture)
     else:
         return render_template('base.html', is_logged_in=False)
+
+
+@app.route("/text-completion-post", methods=['POST'])
+def text_completion_post():
+    if request.method == "POST":
+        input_text = request.form['text']
+        response = openai.Completion.create(
+            model="text-davinci-003",
+            prompt=f"Pick up where the user left off and complete the input text with generated sentences:\n\n{input_text}.",
+            temperature=0.7,
+            max_tokens=256,
+            top_p=1.0,
+            frequency_penalty=0.0,
+            presence_penalty=0.0
+        )
+        corrected_text = response.choices[0].text.strip()
+        return corrected_text
 
 
 @app.route("/text-completion", methods=(['GET', 'POST']))
 @login_required
 def text_completion():
-    return render_template('text_completion.html', is_logged_in=True)
+    name = session.get('name', 'Unknown')
+    picture = session.get('picture', 'Unknown')
+    first_name = name.split()[0]
+    return render_template('text_completion.html', is_logged_in=True, name=first_name, picture=picture)
+
 
 @app.route('/login')
 def google_login():
@@ -111,6 +177,8 @@ def google_authorize():
     resp = google.get('userinfo')
     user_info = resp.json()
     session['email'] = user_info['email']
+    session['name'] = user_info.get('name', 'Unknown')
+    session['picture'] = user_info.get('picture', 'Unknown')
     next_url = session.get('next') or url_for('index')
     return redirect(next_url)
 

@@ -1,0 +1,13 @@
+nav {
+  background-color: #8294C4;
+}
+nav ul li a:hover {
+  background-color: #DBDFEA;
+}
+nav a.active {
+  background-color: #fff;
+  color: #333;
+}
+input[type="submit"] {
+  background-color: #8294C4;
+}
