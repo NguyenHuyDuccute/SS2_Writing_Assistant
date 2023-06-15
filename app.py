@@ -1,9 +1,11 @@
 import os
 from functools import wraps
-
+import pytz
 import openai
-from flask import Flask, redirect, render_template, request, url_for, session
+from flask import Flask, redirect, render_template, request, url_for, session, jsonify
 from authlib.integrations.flask_client import OAuth
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'random secret'
@@ -31,6 +33,30 @@ google = oauth.register(
 
 )
 
+# Database
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+db = SQLAlchemy(app)
+
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    name = db.Column(db.String(120), nullable=False)
+    activities = db.relationship('Activity', backref='user', lazy=True)
+
+
+class Activity(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_email = db.Column(db.String(120), db.ForeignKey('user.email'), nullable=False)
+    activity_type = db.Column(db.String(50), nullable=False)
+    input = db.Column(db.String(255), nullable=False)
+    output = db.Column(db.String(1200), nullable=False)
+    timestamp = db.Column(db.String(40), nullable=False)
+
+
+with app.app_context():
+    db.create_all()
+
 
 def login_required(func):
     @wraps(func)
@@ -49,20 +75,6 @@ def grammar_check():
     name = session.get('name', 'Unknown')
     picture = session.get('picture', 'Unknown')
     first_name = name.split()[0]
-    if request.method == "POST":
-        input_text = request.form['text']
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=f"Correct this to standard English:\n\n{input_text}.",
-            temperature=0,
-            max_tokens=60,
-            top_p=1.0,
-            frequency_penalty=0.0,
-            presence_penalty=0.0
-        )
-        corrected_text = response.choices[0].text.strip()
-        return render_template('grammar_check.html', corrected_text=corrected_text, is_logged_in=True, name=first_name,
-                               picture=picture)
     return render_template('grammar_check.html', is_logged_in=True, name=first_name, picture=picture)
 
 
@@ -72,20 +84,6 @@ def paraphrasing():
     name = session.get('name', 'Unknown')
     picture = session.get('picture', 'Unknown')
     first_name = name.split()[0]
-    if request.method == "POST":
-        input_text = request.form['text']
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=f"paraphase the following paragraph, using as few words from the original paragraph as possible:\n\n{input_text}.",
-            temperature=0,
-            max_tokens=60,
-            top_p=1.0,
-            frequency_penalty=0.0,
-            presence_penalty=0.0
-        )
-        corrected_text = response.choices[0].text.strip()
-        return render_template('paraphrasing.html', corrected_text=corrected_text, is_logged_in=True, name=first_name,
-                               picture=picture)
     return render_template('paraphrasing.html', is_logged_in=True, name=first_name, picture=picture)
 
 
@@ -112,14 +110,21 @@ def test():
         input_text = request.form['text']
         response = openai.Completion.create(
             model="text-davinci-003",
-            prompt=f"Correct this to standard English:\n\n{input_text}.",
-            temperature=0,
-            max_tokens=60,
+            prompt=f"Plagiarism two documents for two content and only show percentage:\n\n{input_text}.",
+            temperature=0.0,
+            max_tokens=1000,
             top_p=1.0,
             frequency_penalty=0.0,
             presence_penalty=0.0
         )
         corrected_text = response.choices[0].text.strip()
+        user_email = User.query.filter_by(email=session['email']).first().email
+        current_time = datetime.now(pytz.utc).astimezone(pytz.timezone('Asia/Bangkok'))
+        formatted_time = current_time.strftime("%H:%M %d-%m-%Y")
+        activity = Activity(user_email=user_email, activity_type='Grammar Check',
+                            input=input_text, output=corrected_text, timestamp=formatted_time)
+        db.session.add(activity)
+        db.session.commit()
         return corrected_text
 
 
@@ -148,6 +153,13 @@ def text_completion_post():
             presence_penalty=0.0
         )
         corrected_text = response.choices[0].text.strip()
+        user_email = User.query.filter_by(email=session['email']).first().email
+        current_time = datetime.now(pytz.utc).astimezone(pytz.timezone('Asia/Bangkok'))
+        formatted_time = current_time.strftime("%H:%M %d-%m-%Y")
+        activity = Activity(user_email=user_email, activity_type='Text completion',
+                            input=input_text, output=corrected_text, timestamp=formatted_time)
+        db.session.add(activity)
+        db.session.commit()
         return corrected_text
 
 
@@ -158,6 +170,30 @@ def text_completion():
     picture = session.get('picture', 'Unknown')
     first_name = name.split()[0]
     return render_template('text_completion.html', is_logged_in=True, name=first_name, picture=picture)
+
+
+@app.route("/user-activities")
+@login_required
+def user_activities():
+    name = session.get('name', 'Unknown')
+    picture = session.get('picture', 'Unknown')
+    first_name = name.split()[0]
+    user_email = session['email']
+    user = User.query.filter_by(email=user_email).first()
+    activities = user.activities
+    activities = list(reversed(activities))
+    return render_template('user_activities.html', activities=activities, is_logged_in=True, name=first_name, picture=picture)
+
+
+@app.route('/delete_activity/<activity_id>', methods=['DELETE'])
+def delete_activity(activity_id):
+    activity = Activity.query.get(activity_id)
+    if activity:
+        db.session.delete(activity)
+        db.session.commit()
+        return jsonify({"success": True})
+    else:
+        return jsonify({"success": False, "error": "Activity not found"})
 
 
 @app.route('/login')
@@ -176,8 +212,14 @@ def google_authorize():
     token = google.authorize_access_token()
     resp = google.get('userinfo')
     user_info = resp.json()
-    session['email'] = user_info['email']
-    session['name'] = user_info.get('name', 'Unknown')
+    email = user_info['email']
+    user = User.query.filter_by(email=email).first()
+    if user is None:
+        user = User(email=email, name=user_info.get('name', 'Unknown'))
+        db.session.add(user)
+        db.session.commit()
+    session['email'] = email
+    session['name'] = user.name
     session['picture'] = user_info.get('picture', 'Unknown')
     next_url = session.get('next') or url_for('index')
     return redirect(next_url)

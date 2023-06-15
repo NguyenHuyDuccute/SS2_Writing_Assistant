@@ -25,7 +25,7 @@
         <div class="inout">
             {% if is_logged_in %}
                 <img src="{{ session['picture'] }}" alt="{{ session['name'] }}" style="border-radius: 50%">
-                <p>Welcome, {{ name }}!</p>
+                <a href="/user-activities" style="text-decoration: none;color: #202123; font-weight: bold;">Welcome, {{ name }}!</a>
                 <a href="/logout" class="nav-log">Log out</a>
             {% else %}
                 <a href="/login" class="nav-log">Log in</a>

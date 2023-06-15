@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user_activities.css') }}"/>
+{% endblock %}
+{% block content %}
+<h1>{{ name }}'s Activities</h1>
+{% if activities %}
+    <table>
+        <thead>
+            <tr>
+                <th class="time-column">Activity Type</th>
+                <th class="column-width">Input</th>
+                <th class="column-width">Output</th>
+                <th class="time-column">Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for activity in activities %}
+            <tr>
+                <td>{{ activity.activity_type }}</td>
+                <td>{{ activity.input }}</td>
+                <td>{{ activity.output }}</td>
+                <td>{{ activity.timestamp }}</td>
+                <td>
+                    <button class="delete-button" onclick="deleteActivity({{ activity.id }})">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p  class="no-activities-message">No recent activity.</p>
+{% endif %}
+<script src="../static/js/user_activities.js"></script>
+{% endblock %}
